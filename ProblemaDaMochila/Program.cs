@@ -4,12 +4,20 @@ using ProblemaDaMochila;
 Console.WriteLine("Problema da mochila");
 
 var simplex = new Simplex();
-
+int contador = 0;
 simplex.DefineFullBaseMatrix();
 simplex.PrintMatrix();
-var linhaPivo = simplex.IndexLinhaPivo(out int colinaPivo);
-simplex.SwitchBasicVar(linhaPivo, colinaPivo);
 
-Console.WriteLine(simplex.varBasica[linhaPivo]);
-Console.WriteLine(simplex.varNaoBasica[colinaPivo]);
-    
+while (simplex.CanContinue())
+{
+    var colunaPivo = simplex.IndexColunaPivo();
+    var linhaPivo = simplex.IndexLinhaPivo(colunaPivo);
+    simplex.SwitchBasicVar(linhaPivo, colunaPivo);
+    simplex.IteracaoSimplex(colunaPivo, linhaPivo);
+    contador++;
+    Console.WriteLine($"Numero de iteracoes: {contador}");
+
+}
+simplex.PrintResultado();
+
+Console.WriteLine("Funfou? :3");

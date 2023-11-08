@@ -15,7 +15,7 @@
         double bVolume = 830;
         double[] bRestricoesItem = new double[30] { 10, 18, 13, 14, 16, 18, 9, 12, 15, 11, 13, 10, 10, 8, 17, 18, 9, 13, 9, 8, 10, 10, 15, 18, 12, 9, 10, 17, 18, 11 };
         public string[] varBasica = new string[32] { "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23", "f24", "f25", "f26", "f27", "f28", "f29", "f30", "f31", "f32" };
-        public string[] varNaoBasica = new string[30] { "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23", "x24", "x25", "x26", "x27", "x28", "x29", "x30" };  
+        public string[] varNaoBasica = new string[62] { "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23", "x24", "x25", "x26", "x27", "x28", "x29", "x30", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23", "f24", "f25", "f26", "f27", "f28", "f29", "f30", "f31", "f32" };  
 
         public void DefinirFO()
         {
@@ -78,68 +78,106 @@
             PrintMatrix();
         }
 
-        public int IndexPivo(out double value)
+        public int IndexColunaPivo()
         {
-            double MaiorValorNegativo = 0;
+            double MenorValorNegativo = 0;
             int indexMaiorValorNegativo = 0;
             for (int i = 0; i < 62; i++)
             {
-                if (matriz[32, i] < MaiorValorNegativo && matriz[32, i] < 0)
+                if (matriz[32, i] < MenorValorNegativo)
                 {
-                    MaiorValorNegativo = matriz[32, i];
+                    MenorValorNegativo = matriz[32, i];
                     indexMaiorValorNegativo = i;
                 }
             }
-            value = MaiorValorNegativo;
             return indexMaiorValorNegativo;
         }
 
-        public int IndexLinhaPivo(out int indexPivo)
+        public bool CanContinue()
         {
-            indexPivo = IndexPivo(out double value);
+            for (int i = 0; i < 62; i++)
+            {
+                if (matriz[32, i] < 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public int IndexLinhaPivo(int indexColunaPivo)
+        {
             double PP;
             double minValue = Double.MaxValue ;
-            int index = 0;
+            int indexLinha = 0;
             for(int i = 0; i< 33; i++)
             {
-                var denominador = matriz[i, indexPivo];
+                var denominador = matriz[i, indexColunaPivo];
                 if (denominador != 0) {
                     PP = (matriz[i, 62] / denominador);
                     if (PP < minValue && PP>0)
                     {
                         minValue = PP;
-                        index = i;
+                        indexLinha = i;
                     }
                 }
             }
-            return index;
+            return indexLinha;
         }
 
-        public void SwitchBasicVar(int indexBasica, int indexNaoBasica)
-        {
-            var valueBasica = varBasica[indexBasica];
-            var valueNaoBasica = varNaoBasica[indexNaoBasica];
-            varBasica[indexBasica] = valueNaoBasica;
-            varNaoBasica[indexNaoBasica] = valueBasica;
-        }
+        // Os indexes de linha pivo sempre são os mesmo da identificacao das variaveis basicas
+        // index linha = index variavel basica
+        // Essa condição é importante para quando formos relacionar aos valores após o simplex aos itens (Xn)
+        public void SwitchBasicVar(int indexBasica, int indexVariavelColuna) => varBasica[indexBasica] = varNaoBasica[indexVariavelColuna];
 
-        public void IteracaoSimplex(int indexPivo, int indexLinha)
+        public void IteracaoSimplex(int indexColunaPivo, int indexLinhapivo)
         {
-            double valorParaEscalonar = matriz[indexLinha, indexPivo];
-            
+                EscalonaPivo(indexLinhapivo, indexColunaPivo);
+
             //logica para a linhas novas 
-            for(int i = 0; i < 32; i++)
+            for (int i = 0; i < 33; i++)
+                {
+                if (IsPivo(i, indexLinhapivo))
+                    continue;
+                EscalonaNovaLinha(i, indexLinhapivo, indexColunaPivo);
+                }
+        }
+
+        public bool IsPivo(int iteracao, int linhaPivo) => iteracao.Equals(linhaPivo) ? true:false;
+
+        
+        public void EscalonaPivo(int indexLinhaPivo, int indexColunaPivo) 
+        {
+            var baseValue = matriz[indexLinhaPivo, indexColunaPivo];
+            for(int i = 0; i < 63; i++)
             {
-                if (IsPivo(i, indexLinha))
-                    EscalonaPivo();
-                else
-                    EscalonaNovaLinha();
+                matriz[indexLinhaPivo, i] = matriz[indexLinhaPivo, i] / baseValue;
+            }    
+        }
+        public void EscalonaNovaLinha(int indexLinhaAtual,int indexLinhaPivo, int indexColunaPivo) 
+        {
+            var baseValue = matriz[indexLinhaAtual, indexColunaPivo];
+            for (int i = 0; i < 63; i++)
+            {
+                matriz[indexLinhaAtual, i] = matriz[indexLinhaAtual, i]-(baseValue * matriz[indexLinhaPivo, i]);
             }
         }
 
-        public bool IsPivo(int iteracao, int pivo) => iteracao.Equals(pivo)? true:false;
+        public void PrintResultado()
+        {
+            Console.WriteLine();
+            Console.Write("Variaveis básicas: ");
+            for (int i = 0;i < 32; i++)
+            {
+                Console.Write($"{varBasica[i]}, ");
+            }
+            Console.WriteLine();
+            Console.WriteLine("Resultado");
+            Console.WriteLine("----------------------------------------------------");
+            Console.WriteLine("Variavel | Valor");
 
-        public void EscalonaPivo() { }
-        public void EscalonaNovaLinha() { }
+            for (int i = 0;i < 32; i++)
+                Console.WriteLine($"{varBasica[i]} | {matriz[i,62]}");
+            Console.WriteLine($"Z | {matriz[32, 62]}");
+
+        }
     }
 }
