@@ -49,9 +49,7 @@ namespace Problema_do_transporte
             for(int i=0 ; i <= 25; i++)
             {
                 for(int j =0; j<=5; j++)
-                {
                     matriz[i, j] = (lista[i])[j];
-                }
             }
         }
 
@@ -93,6 +91,7 @@ namespace Problema_do_transporte
 
             Console.WriteLine("");
         }
+        
         public void PrintPenalidadeOferta()
         {
             Console.WriteLine("Penalidade para as ofertas");
