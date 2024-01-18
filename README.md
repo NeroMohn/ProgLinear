@@ -4,6 +4,8 @@ Linear Programming (LP) is a powerful mathematical optimization technique used t
 Features:
 
 This repository contains a C# implementation that addresses two transportation problems, made for my LP class 📚
+This code is really raw, due the nature of the class (we had to show every algorithmic step to solve the problem)
+Also this solution is not intended to be generic, but I hope it can help you for your class work 😊
 
 # Getting Started:
 
@@ -16,4 +18,4 @@ To use this solver, follow these steps:
 
 * Run the program.cs of the specific project that you are looking for.
 
-This solution is not intended to be generic, but you can use it as a reference for your own problems 😊 
+
